@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Service
 public class AgenteAtendimentoService {
+
     private final AgenteAtendimentoRepository agenteAtendimentoRepository;
 
     @Autowired
@@ -17,12 +18,11 @@ public class AgenteAtendimentoService {
         this.agenteAtendimentoRepository = agenteAtendimentoRepository;
     }
 
-
-    public List<AgenteAtendimento> getAllAgentesAtendimento() {
+    public List<AgenteAtendimento> getAllAgentes() {
         return agenteAtendimentoRepository.findAll();
     }
 
-    public Optional<AgenteAtendimento> getAgenteAtendimentoById(Long id) {
+    public Optional<AgenteAtendimento> getAgenteById(Long id) {
         return agenteAtendimentoRepository.findById(id);
     }
 
@@ -30,27 +30,21 @@ public class AgenteAtendimentoService {
         return agenteAtendimentoRepository.save(agenteAtendimento);
     }
 
-    public AgenteAtendimento updateAgenteAtendimento(Long id, AgenteAtendimento updateAgenteAtendimento) {
-        Optional<AgenteAtendimento> existingAgenteAtendimentoOptional = agenteAtendimentoRepository.findById(id);
+    public Optional<AgenteAtendimento> updateAgente(Long id, AgenteAtendimento agente) {
+        Optional<AgenteAtendimento> existingAgente = agenteAtendimentoRepository.findById(id);
+        existingAgente.ifPresent(a -> {
+            a.setUser(agente.getUser());
+            a.setAtendimentos(agente.getAtendimentos());
+            agenteAtendimentoRepository.save(a);
+        });
+        return existingAgente;
+    }
 
-        if (existingAgenteAtendimentoOptional.isPresent()) {
-            AgenteAtendimento existingAgenteAtendimento = existingAgenteAtendimentoOptional.get();
-            existingAgenteAtendimento.setUser(updateAgenteAtendimento.getUser());
-            existingAgenteAtendimento.setAtendimentos(updateAgenteAtendimento.getAtendimentos());
-
-            return agenteAtendimentoRepository.save(existingAgenteAtendimento);
-        } else {
-            throw new IllegalArgumentException("AgenteAtendimento not found with id: " + id);
+    public boolean deleteAgente(Long id) {
+        if (agenteAtendimentoRepository.existsById(id)) {
+            agenteAtendimentoRepository.deleteById(id);
+            return true;
         }
-    }
-
-    public void deleteAgenteAtendimento(Long id) {
-        agenteAtendimentoRepository.deleteById(id);
-    }
-    public String getNomeAgente(Long id) {
-        AgenteAtendimento agenteAtendimento = agenteAtendimentoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Agente de atendimento não encontrado"));
-
-        return agenteAtendimento.getNome();
+        return false;
     }
 }

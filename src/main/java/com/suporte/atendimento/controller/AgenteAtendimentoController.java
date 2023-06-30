@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/agentes-atendimento")
+@RequestMapping("/agentes")
 public class AgenteAtendimentoController {
+
     private final AgenteAtendimentoService agenteAtendimentoService;
 
     @Autowired
@@ -20,36 +21,32 @@ public class AgenteAtendimentoController {
         this.agenteAtendimentoService = agenteAtendimentoService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<AgenteAtendimento>> getAllAgentesAtendimento() {
-        List<AgenteAtendimento> agentesAtendimento = agenteAtendimentoService.getAllAgentesAtendimento();
-        return ResponseEntity.ok(agentesAtendimento);
+    @GetMapping("/getall")
+    public ResponseEntity<List<AgenteAtendimento>> getAllAgentes() {
+        List<AgenteAtendimento> agentes = agenteAtendimentoService.getAllAgentes();
+        return new ResponseEntity<>(agentes, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AgenteAtendimento> getAgenteAtendimentoById(@PathVariable Long id) {
-        Optional<AgenteAtendimento> agenteAtendimentoOptional = agenteAtendimentoService.getAgenteAtendimentoById(id);
-        return agenteAtendimentoOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/getByid/{id}")
+    public ResponseEntity<AgenteAtendimento> getAgenteById(@PathVariable Long id) {
+        Optional<AgenteAtendimento> agente = agenteAtendimentoService.getAgenteById(id);
+        return agente.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<AgenteAtendimento> createAgenteAtendimento(@RequestBody AgenteAtendimento agenteAtendimento) {
-        AgenteAtendimento createdAgenteAtendimento = agenteAtendimentoService.createAgenteAtendimento(agenteAtendimento);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAgenteAtendimento);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<AgenteAtendimento> updateAgente(@PathVariable Long id, @RequestBody AgenteAtendimento agente) {
+        Optional<AgenteAtendimento> updatedAgente = agenteAtendimentoService.updateAgente(id, agente);
+        return updatedAgente.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<AgenteAtendimento> updateAgenteAtendimento(
-            @PathVariable Long id,
-            @RequestBody AgenteAtendimento updatedAgenteAtendimento
-    ) {
-        AgenteAtendimento agenteAtendimento = agenteAtendimentoService.updateAgenteAtendimento(id, updatedAgenteAtendimento);
-        return ResponseEntity.ok(agenteAtendimento);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAgenteAtendimento(@PathVariable Long id) {
-        agenteAtendimentoService.deleteAgenteAtendimento(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteAgente(@PathVariable Long id) {
+        boolean deleted = agenteAtendimentoService.deleteAgente(id);
+        if (deleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

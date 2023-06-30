@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/atendimentos")
+@RequestMapping("/atendimentos")
 public class AtendimentoController {
     private final AtendimentoService atendimentoService;
 
@@ -20,13 +20,13 @@ public class AtendimentoController {
         this.atendimentoService = atendimentoService;
     }
 
-    @GetMapping
+    @GetMapping("/getall")
     public ResponseEntity<List<Atendimento>> getAllAtendimentos() {
         List<Atendimento> atendimentos = atendimentoService.getAllAtendimentos();
         return ResponseEntity.ok(atendimentos);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<Atendimento> getAtendimentoById(@PathVariable Long id) {
         Optional<Atendimento> atendimentoOptional = atendimentoService.getAtendimentoById(id);
         return atendimentoOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -38,7 +38,7 @@ public class AtendimentoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAtendimento);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Atendimento> updateAtendimento(
             @PathVariable Long id,
             @RequestBody Atendimento updatedAtendimento
@@ -47,7 +47,7 @@ public class AtendimentoController {
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAtendimento(@PathVariable Long id) {
         atendimentoService.deleteAtendimento(id);
         return ResponseEntity.noContent().build();

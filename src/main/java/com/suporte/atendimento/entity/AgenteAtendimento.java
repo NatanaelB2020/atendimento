@@ -1,9 +1,10 @@
 package com.suporte.atendimento.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,26 +13,28 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@ToString(exclude = "user") // Excluir o relacionamento "user" do toString para evitar um ciclo infinito
 public class AgenteAtendimento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome")
-    private String nome;
-
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "agenteAtendimento")
     private List<Atendimento> atendimentos;
 
-    public String getNome() {
+    @Column(name = "nome")
+    private String nome;
+
+    // Constructors, getters, and setters
+
+    public void setNome() {
         if (user != null) {
-            return user.getUsername();
+            this.nome = user.getUsername();
         }
-        return null;
     }
 }

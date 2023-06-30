@@ -53,10 +53,12 @@ public class UserController {
         // Criar Agente de Atendimento relacionado ao User criado
         AgenteAtendimento agenteAtendimento = new AgenteAtendimento();
         agenteAtendimento.setUser(createdUser);
+        agenteAtendimento.setNome(createdUser.getUsername()); // Definir o nome do agente como o username do usuário
         agenteAtendimentoService.createAgenteAtendimento(agenteAtendimento);
 
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
+
 
 
     @PutMapping("/update/{id}")
